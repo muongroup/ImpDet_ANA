@@ -29,6 +29,7 @@
 #include <TObject.h>
 
 #include "FilePath.hh"
+#include "CountManager.hh"
 
 using namespace std;
 
@@ -38,16 +39,15 @@ typedef struct
   time_t m_time;
 } meas_t;
 
-bool StrString(const char *s1, const char *s2);
-
 int timespan = 3600.; //[sec]分割ファイルの時間間隔
 
 void idana()
 {
+  CountManager cM;
 
-  std::ofstream all_data("./2_txt/all_data.txt");
-  std::ofstream data_00("./2_txt/00_data.txt");
-  std::ofstream all_data_ch("./2_txt/all_data_ch.txt");
+  ofstream all_data("./2_txt/all_data.txt");
+  ofstream data_00("./2_txt/00_data.txt");
+  ofstream all_data_ch("./2_txt/all_data_ch.txt");
 
   TFile *fout = new TFile("out.root", "RECREATE", "idana_results");
 
@@ -100,7 +100,7 @@ void idana()
     }
   }
 
-  std::ifstream config("./1_info/config.txt"); //config.txtから読み込み
+  ifstream config("./1_info/config.txt"); //config.txtから読み込み
   for (Int_t i = 0; i < n; i++)
   {
     config >> esrch[i] >> place[i]; //config.txtから読み込む
@@ -108,8 +108,8 @@ void idana()
   config.close();
 
   Double_t ped[n], thresh_ch[n];
-  std::ifstream pedestal("./1_info/pedestal.txt");
-  std::ifstream threshould("./1_info/threshould.txt");
+  ifstream pedestal("./1_info/pedestal.txt");
+  ifstream threshould("./1_info/threshould.txt");
   for (Int_t i = 0; i < n; i++)
   {
     threshould >> thresh_ch[i];
@@ -126,28 +126,28 @@ void idana()
 
   for (Int_t i = 0; i < n; i++)
   {
-    std::ostringstream _cname;
+    ostringstream _cname;
     _cname << "cch" << i;
-    std::string chhist_name = _cname.str();
+    string chhist_name = _cname.str();
     coinhist[i] = new TH1F(chhist_name.c_str(), chhist_name.c_str(), 4096, 0, 4096);
 
-    std::ostringstream _name;
+    ostringstream _name;
     _name << "ch" << i;
-    std::string hist_name = _name.str();
+    string hist_name = _name.str();
     hist[i] = new TH1F(hist_name.c_str(), hist_name.c_str(), 4096, 0, 4096);
 
-    std::ostringstream _lostname;
+    ostringstream _lostname;
     _lostname << "lostch" << i;
-    std::string losthist_name = _lostname.str();
+    string losthist_name = _lostname.str();
     losthist[i] = new TH1F(losthist_name.c_str(), losthist_name.c_str(), 4096, 0, 4096);
   }
 
   TH1F *vechist[31]; //64個のMPPCのコインシデンスを取った波高データのヒストグラム
   for (Int_t i = 0; i < 31; i++)
   {
-    std::ostringstream _aname;
+    ostringstream _aname;
     _aname << "vec" << i;
-    std::string ahist_name = _aname.str();
+    string ahist_name = _aname.str();
     vechist[i] = new TH1F(ahist_name.c_str(), ahist_name.c_str(), 4096, 0, 4096);
   }
 
@@ -160,9 +160,12 @@ void idana()
   stringstream ss1;
   ofstream dev("./2_txt/deviation.txt");
 
+  /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+  /*Get data files path by using Class FilePath.*/
+  /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
   FilePath fp;
   fp.SetFilePath();
-  fp.FilePathMessenger();
+  fp.FileListMessenger();
 
   int filenum = fp.GetFilenum();
   string filename[filenum];
@@ -170,72 +173,8 @@ void idana()
   for(int i=0;i<filenum;i++){
     filename[i]=namelist[i]->d_name;
   }
-   
-/*
-  const char *path = "./"; //文字列型
-  DIR *dp;                 //ファイル一覧を取得
-  dirent *entry;           //direntとは実行が成功したら0,失敗したら-1を返す
-  string filename[4096];
-  int filenum = 0;
-  dp = opendir(path); //path以下のやつを全部開く
+  /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-  int d = 0;
-  int dd = 0;
-  int ddd = 0;    //桁ごとのカウント数
-  size_t len = 0; // .dat0ファイルの文字列の長さを格納
-  while ((entry = readdir(dp)) != NULL)
-  {
-    string tmp;
-    tmp = entry->d_name;
-
-    if (StrString(tmp.c_str(), ".dat"))
-    {
-      if (d == 0)
-      {
-        len = strlen(tmp.c_str());
-      } //.dat0 ファイルの文字列の長さを取得
-      if (strlen(tmp.c_str()) == len)
-      {
-        filename[d] = tmp;
-        d++;
-      }
-      else if (strlen(tmp.c_str()) == len + 1)
-      {
-        filename[dd + 10] = tmp;
-        dd++;
-      }
-      else if (strlen(tmp.c_str()) == len + 2)
-      {
-        filename[ddd + 100] = tmp;
-        ddd++;
-      }
-      else
-      {
-        cout << "loaded wrong file or more than 999 files" << endl;
-        return;
-      }
-    }
-  }
-
-  filenum = d + dd + ddd;
-
-  if (filenum == 0)
-  {
-    cout << " No file loaded." << endl
-         << endl;
-    return;
-  }
-  else
-  {
-    cout << filenum << " files loaded." << endl
-         << endl;
-  }
-
-  for (int i = 0; i < filenum; i++)
-  {
-    cout << i << " " << filename[i] << endl;
-  }
-*/
   struct stat st;
   double sfile[filenum];
 
@@ -246,16 +185,8 @@ void idana()
     ss1.str("");
 
     ss1 << filename[iiii];
-    std::ifstream hoge(ss1.str().c_str(), std::ios::binary);
-    if (!hoge.is_open())
-    {
-      cout << "no file" << endl;
-      return;
-    }
-    else
-    {
-      cout << iiii << ": " << ss1.str() << " loading " << endl;
-    }
+    ifstream hoge(ss1.str().c_str(), ios::binary);
+    fp.LoadingMessenger(!hoge.is_open(),iiii);
 
     int eas_s1 = 0;   //easiroc識別番号
     int eas_s2 = 0;   //easiroc識別番号
@@ -263,8 +194,6 @@ void idana()
     int e_count2 = 0; //イベントカウンター
     int buffermem1[64];
     int buffermem2[64];
-    int counter = 0;
-    int read_count = 0;
     int trigger = 0;
 
     stat(ss1.str().c_str(), &st);
@@ -282,9 +211,7 @@ void idana()
       //////////////////////////////////////    mu-PSD1    /////////////////////////////////////////////////////////////
       ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       hoge.read((char *)&val, sizeof(int)); //一個目のヘッダーを読み込む
-      //   cout<<val<<endl;
-      // int buffermem[65];
-      read_count++;
+      cM.CountUp("READ");
       if (val == 0xffffea0c) //この形式が0xffff0xea0cの場合
       {
         hoge.read((char *)&val, sizeof(int)); //次の行を読み込む(Header2 : reserved Number of word(16bit))
@@ -313,14 +240,14 @@ void idana()
       }
       else
       {
-        cout << "Header is not correct (mu-PSD1)" << read_count << endl;
+        cout << "Header is not correct (mu-PSD1) READ COUNT:" << cM.GetCount("READ") << endl;
       }
 
       ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       //////////////////////////////////////    mu-PSD2    /////////////////////////////////////////////////////////////
       ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       hoge.read((char *)&val, sizeof(int)); //一個目のヘッダーを読み込む
-      read_count++;
+      cM.CountUp("READ");
       if (val == 0xffffea0c) //この形式が0xffff0xea0cの場合
       {
         hoge.read((char *)&val, sizeof(int)); //次の行を読み込む(Header2 : reserved Number of word(16bit))
@@ -349,13 +276,14 @@ void idana()
       }
       else
       {
-        cout << "Header is not correct (mu-PSD2)" << read_count << endl;
+
+        cout << "Header is not correct (mu-PSD2) READ COUNT:" << cM.GetCount("READ") << endl;
       }
 
       if (e_count1 != e_count2)
       {
         cout << "event data is not match" << endl;
-        cout << "mu-PSD1 evene num: " << e_count1 << "mu-PSD2 event num: " << e_count2 << endl;
+        cout << "mu-PSD1 event num: " << e_count1 << "mu-PSD2 event num: " << e_count2 << endl;
       }
 
       Int_t maxADCch1 = 0;     //1シート目に一番波高の高いMPPCのADC-pedestal値
@@ -494,7 +422,8 @@ void idana()
         iden_eve++;
         if (x_vec == 15 && y_vec == 15)
         {
-          counter++;
+          // counter++;
+          cM.CountUp("ZERO");
           data_00 << maxch1 << "  " << maxch2 << "  " << maxch3 << "  " << maxch4 << endl;
         }
         all_data_ch << maxch1 << "  " << maxch2 << "  " << maxch3 << "  " << maxch4 << endl;
@@ -524,13 +453,13 @@ void idana()
       }
     }
 
-    cout << ss1.str() << "   " << counter << endl;
-    dev << ctime(&date) << "  " << iden_eve << "  " << trigger << "  " << counter << endl;
+    cout << ss1.str() << " :(0,0) COUNT:" << cM.GetCount("ZERO") << endl;
+    dev << ctime(&date) << "  " << iden_eve << "  " << trigger << "  " << cM.GetCount("ZERO") << endl;
     trigger = 0;
     iden_eve = 0;
 
-    gr2->SetPoint(iiii, iiii, counter);
-    gr2->SetPointError(iiii, 0, sqrt((double)counter));
+    gr2->SetPoint(iiii, iiii, cM.GetCount("ZERO"));
+    gr2->SetPointError(iiii, 0, sqrt((double)cM.GetCount("ZERO")));
 
     //  f << ss1.str().c_str() << "," << coinhist[39]->GetEntries() << endl;
   }
@@ -626,7 +555,7 @@ void idana()
   //  cvs2->SetLogy();
   Double_t means[n], CONSTANT[n], MEANS[n], SIGMA[n];
   Double_t MEANS_error[n];
-  std::ofstream coin_para("./2_txt/fitting_parameter_coin.txt");
+  ofstream coin_para("./2_txt/fitting_parameter_coin.txt");
   coin_para << "means"
             << " "
             << "CONSTANT"
@@ -714,7 +643,7 @@ void idana()
   image_ij->Draw("colz");
   cvs4->Print("./4_gif/Intensity_2D.gif");
 
-  std::ofstream output("./2_txt/output.txt");
+  ofstream output("./2_txt/output.txt");
   for (Int_t i = 0; i < 31; i++)
   {
     for (Int_t j = 0; j < 31; j++)
@@ -738,20 +667,9 @@ void idana()
 
   fout->Write();
 }
-////////////////////////////////////////////////////////////////////////////////関数の定義
 
-bool StrString(const char *s1, const char *s2) 
-{
-  int n;
-  n = strlen(s2);
-  while (1)
-  {
-    s1 = strchr(s1, s2[0]);
-    if (s1 == NULL)              return false;
-    if (strncmp(s1, s2, n) == 0) return true;
-    s1++;
-  }
-}
+
+
 
 void StandaloneApplication(int argc, char **argv)
 {

@@ -60,13 +60,29 @@ struct dirent** FilePath::GetNameList(){
 }
 
 // Mesenger
-void FilePath::FilePathMessenger(){
+void FilePath::FileListMessenger(){
     if(filenum_==0){
         cout << "No file loaded." << endl;
         return;
     }
 
     for(int i=0;i<filenum_;i++){
-        cout << i << " " << namelist_[i]->d_name << endl;
+        cout << "----------Below file will be loaded---------" << endl;
+        cout << i << ": " << namelist_[i]->d_name << endl;
+        cout << "----------------File List END---------------" << endl << endl;
     }
+}
+
+void FilePath::LoadingMessenger(bool bin, int i){
+    if(bin)
+    {
+        cout << "----------------NO FILE--------------------" << endl;
+        cout << "--------------EXIT PROGRAM-----------------" << endl;
+        exit(0);
+    }
+    else
+    {
+        cout << "LODING-- " << i << ": " << namelist_[i]->d_name << endl;
+    }
+    return;
 }

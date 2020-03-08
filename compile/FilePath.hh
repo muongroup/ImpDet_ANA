@@ -16,7 +16,8 @@ public:
     int GetFilenum();
     struct dirent **GetNameList();
     // messenger
-    void FilePathMessenger();
+    void FileListMessenger();
+    void LoadingMessenger(bool,int);
 
 protected:
     static int filenum_;

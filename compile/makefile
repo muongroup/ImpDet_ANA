@@ -1,7 +1,7 @@
 TARGET = idana
  
-SRCS = $(TARGET).cc FilePath.cc
-OBJS = $(TARGET).o  FilePath.o
+SRCS = $(TARGET).cc FilePath.cc CountManager.cc
+OBJS = $(TARGET).o  FilePath.o  CountManager.o
  
 ROOTCFLAGS = $(shell root-config --cflags)
 # ROOTCFLAGS = -pthread -std=c++11 -m64 -I/opt/root-6.20.00/install/include
