@@ -11,12 +11,14 @@ This Class search data files in the current directory.
 #include <dirent.h>
 #include <string.h>
 
+#include <RtypesCore.h>
+
 #include "FilePath.hh"
 
 using namespace std;
 
 // Declaration static variable
-int FilePath::filenum_;
+Int_t FilePath::filenum_;
 
 // constructor
 FilePath::FilePath(){
@@ -24,12 +26,12 @@ FilePath::FilePath(){
 
 // destractor
 FilePath::~FilePath(){
-    for(int i=0;i<filenum_;i++){free(namelist_[i]);}
+    for(Int_t i=0;i<filenum_;i++){free(namelist_[i]);}
     free(namelist_);
 }
 
 //  Option Method
-int FilePath::scanExtract(const struct dirent* dir)
+Int_t FilePath::scanExtract(const struct dirent* dir)
 {
     regex regex(".*dat.*");
      return (regex_search(dir->d_name,regex));
@@ -37,21 +39,13 @@ int FilePath::scanExtract(const struct dirent* dir)
 
 //  Set Method
 void FilePath::SetFilePath(){
-    int i=0;
     filenum_ = scandir("./",&namelist_,scanExtract,versionsort);
-    if (filenum_ < 0)
-        perror("scandir");
-    else {
-        while (i < filenum_) {
-            printf("%s\n", namelist_[i]->d_name);
-            i++;
-        }
-    }
+    if (filenum_ < 0) {perror("scandir");}
     return;
 }
 
 //  GetMethod
-int FilePath::GetFilenum(){
+Int_t FilePath::GetFilenum(){
     return filenum_;
 }
 
@@ -65,15 +59,16 @@ void FilePath::FileListMessenger(){
         cout << "No file loaded." << endl;
         return;
     }
+    cout << "----------Below file will be loaded---------" << endl;
 
-    for(int i=0;i<filenum_;i++){
-        cout << "----------Below file will be loaded---------" << endl;
+    for(Int_t i=0;i<filenum_;i++){
         cout << i << ": " << namelist_[i]->d_name << endl;
-        cout << "----------------File List END---------------" << endl << endl;
     }
+    cout << "----------------File List END---------------" << endl
+         << endl;
 }
 
-void FilePath::LoadingMessenger(bool bin, int i){
+void FilePath::LoadingMessenger(bool bin, Int_t i){
     if(bin)
     {
         cout << "----------------NO FILE--------------------" << endl;

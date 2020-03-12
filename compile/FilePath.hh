@@ -1,6 +1,8 @@
 #ifndef FilePath_h
 #define FilePath_h 1
 
+#include <RtypesCore.h>
+
 class FilePath
 {
 public:
@@ -9,18 +11,18 @@ public:
 
 public:
     // option
-    static int scanExtract(const struct dirent *dir);
+    static Int_t scanExtract(const struct dirent *dir);
     // set method
     void SetFilePath();
     // get method
-    int GetFilenum();
+    Int_t GetFilenum();
     struct dirent **GetNameList();
     // messenger
     void FileListMessenger();
-    void LoadingMessenger(bool,int);
+    void LoadingMessenger(bool,Int_t);
 
 protected:
-    static int filenum_;
+    static Int_t filenum_;
     struct dirent **namelist_;
 };
 #endif
