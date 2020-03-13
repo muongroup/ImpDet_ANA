@@ -130,11 +130,14 @@ void DataProcess::GetDatafromBinary(ifstream &aFile)
     }
 }
 
-
 void DataProcess::SetADCch()
 {
     for (Int_t i = 0; i < SHEETNUM; i++)
     {
+        maxADCch_[i] = 0;
+        maxADCch_2nd_[i] = 0;
+        maxCH_[i] = 0;
+        maxCH_2nd_[i] = 0;
         for (Int_t j = 0; j < CH / 4; j++)
         {
             Int_t index = j + i * (CH / 4);
@@ -155,6 +158,7 @@ void DataProcess::SetFlag()
 {
     for (Int_t i = 0; i < SHEETNUM; i++)
     {
+        flag_[i] = false;
         if (maxADCch_[i] > thresh_[maxCH_[i]])
         {
             if (maxADCch_2nd_[i] > thresh_[maxCH_[i]] && abs(maxCH_[i] - maxCH_2nd_[i]) > 1)
@@ -176,6 +180,10 @@ void DataProcess::CoinEveProcess(Int_t iiii)
         xVec_ = (maxCH_[1] - 16) - (maxCH_[3] - 48) + 15;
         yVec_ = (maxCH_[2] - 32) - maxCH_[0] + 15;
 
+        // printf("CH %d ADC %d\n", maxCH_[0], maxADCch_[0]);
+        // printf("CH %d ADC %d\n", maxCH_[1], maxADCch_[1]);
+        // printf("CH %d ADC %d\n", maxCH_[2], maxADCch_[2]);
+        // printf("CH %d ADC %d\n", maxCH_[3], maxADCch_[3]);
         HistManager::SetCoinhist(maxCH_[0], maxADCch_[0]);
         HistManager::SetCoinhist(maxCH_[1], maxADCch_[1]);
         HistManager::SetCoinhist(maxCH_[2], maxADCch_[2]);
@@ -193,7 +201,7 @@ void DataProcess::CoinEveProcess(Int_t iiii)
 
         for (Int_t i = 0; i < SHEETNUM; i++)
         {
-            if (xVec_ == 15 && yVec_ == 15)
+            if (xVec_ == 15)
             {
                 HistManager::SetVechist(yVec_, maxADCch_[i]);
             }
@@ -208,4 +216,44 @@ void DataProcess::WriteDeviation(time_t date)
          << CountManager::GetCount("IDEA") << "  "
          << CountManager::GetCount("ACCE") << "  "
          << CountManager::GetCount("ZERO") << endl;
+}
+
+void DataProcess::WriteFitPara()
+{
+    Double_t means[CH];
+    Double_t CONSTANT[CH];
+    Double_t MEANS[CH];
+    Double_t SIGMA[CH];
+    Double_t MEANS_error[CH];
+    memcpy(means, HistManager::means, sizeof(HistManager::means));
+    memcpy(CONSTANT, HistManager::CONSTANT, sizeof(HistManager::CONSTANT));
+    memcpy(MEANS, HistManager::MEANS, sizeof(HistManager::MEANS));
+    memcpy(SIGMA, HistManager::SIGMA, sizeof(HistManager::SIGMA));
+    memcpy(MEANS_error, HistManager::MEANS_error, sizeof(HistManager::MEANS_error));
+
+    *coinPara << "means"
+              << " "
+              << "CONSTANT"
+              << " "
+              << "MEANS"
+              << " "
+              << "SIGMA"
+              << " "
+              << "MEANS_error" << endl;
+    for (Int_t i = 0; i < CH; i++)
+    {
+        *coinPara << means[i] << " " << CONSTANT[i] << " " << MEANS[i] << " " << SIGMA[i] << " " << MEANS_error[i] << endl;
+    }
+}
+
+void DataProcess::VecCountProcess()
+{
+    for (Int_t i = 0; i < VEC; i++)
+    {
+        for (Int_t j = 0; j < VEC; j++)
+        {
+            HistManager::SetVecplot(i - 15, j - 15, (Double_t)vecCnt_[i][j]);
+            *vecOut << i - 15 << "  " << j - 15 << "  " << vecCnt_[i][j] << endl;
+        }
+    }
 }

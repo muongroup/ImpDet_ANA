@@ -1,0 +1,23 @@
+TARGET = idana
+ 
+SRCS = $(TARGET).cc FilePath.cc CountManager.cc HistMnager.cc DataProcess.cc 
+OBJS = $(TARGET).o  FilePath.o  CountManager.o HistManager.o DataProcess.o 
+ 
+ROOTCFLAGS = $(shell root-config --cflags)
+ROOTLIBS   = $(shell root-config --libs)
+ROOTGLIBS = $(shell root-config --glibs)
+
+CXXFLAGS   = $(ROOTCFLAGS) -Wall -fPIC -g -ggdb
+CXXLIBS    = $(ROOTLIBS)
+CC = g++ 
+ 
+$(TARGET): $(OBJS)
+	$(CC) $(OBJS) $(CXXLIBS) $(CXXFLAGS)  -o $@
+
+# suffix rule
+.cc.o:
+	$(CC) $(CXXLIBS) $(CXXFLAGS) -c $<
+
+# clean
+clean:
+	rm -f $(TARGET) $(OBJS)

@@ -27,6 +27,8 @@ public:
     void SetFlag();
     void CoinEveProcess(Int_t);
     void WriteDeviation(time_t date);
+    void WriteFitPara();
+    void VecCountProcess();
 
 protected:
     // output file

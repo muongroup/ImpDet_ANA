@@ -1,26 +1,35 @@
-TARGET = idana
- 
-SRCS = $(TARGET).cc FilePath.cc CountManager.cc HistMnager.ccDataProcess.cc 
-OBJS = $(TARGET).o  FilePath.o  CountManager.o HistManager.o DataProcess.o 
- 
-ROOTCFLAGS = $(shell root-config --cflags)
-# ROOTCFLAGS = -pthread -std=c++11 -m64 -I/opt/root-6.20.00/install/include
-ROOTLIBS   = $(shell root-config --libs)
-# ROOTLIBS   = -L/opt/root-6.20.00/install/lib -lCore -lImt -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lROOTVecOps -lTree -lTreePlayer -lRInt_t -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lROOTDataFrame -pthread -lm -ldl -rdynamic
-ROOTGLIBS = $(shell root-config --glibs)
-# ROOTGLIBS = -L/opt/root-6.20.00/install/lib -lGui -lCore -lImt -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lROOTVecOps -lTree -lTreePlayer -lRInt_t -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lROOTDataFrame -pthread -lm -ldl -rdynamic
+COMPILER  = g++
+CFLAGS    = $(shell root-config --cflags) -g -MMD -MP -Wall -Wextra -Winit-self -Wno-missing-field-initializers
+ifeq "$(shell getconf LONG_BIT)" "64"
+  LDFLAGS =$(shell root-config --libs)
+else
+  LDFLAGS =$(shell root-config --libs)
+endif
+LIBS      = 
+INCLUDE   = -I./include
+TARGET    = idana
+SRCDIR    = ./source
+ifeq "$(strip $(SRCDIR))" ""
+  SRCDIR  = .
+endif
+SOURCES   = $(wildcard $(SRCDIR)/*.cc)
+OBJDIR    = ./obj
+ifeq "$(strip $(OBJDIR))" ""
+  OBJDIR  = .
+endif
+OBJECTS   = $(addprefix $(OBJDIR)/, $(notdir $(SOURCES:.cc=.o)))
+DEPENDS   = $(OBJECTS:.o=.d)
 
-CXXFLAGS   = $(ROOTCFLAGS) -Wall -fPIC
-CXXLIBS    = $(ROOTLIBS)
-CC = g++ -g -ggdb
- 
-$(TARGET): $(OBJS)
-	$(CC) $(OBJS) $(CXXLIBS) $(CXXFLAGS)  -o $@
+$(TARGET): $(OBJECTS) $(LIBS)
+	$(COMPILER) -o $@ $^ $(LDFLAGS)
 
-# suffix rule
-.cc.o:
-	$(CC) $(CXXLIBS) $(CXXFLAGS) -c $<
+$(OBJDIR)/%.o: $(SRCDIR)/%.cc
+	-mkdir -p $(OBJDIR)
+	$(COMPILER) $(CFLAGS) $(INCLUDE) -o $@ -c $<
 
-# clean
+all: clean $(TARGET)
+
 clean:
-	rm -f $(TARGET) $(OBJS)
+	-rm -f $(OBJECTS) $(DEPENDS) $(TARGET)
+
+-include $(DEPENDS)
