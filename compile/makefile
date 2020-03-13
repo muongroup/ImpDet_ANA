@@ -7,7 +7,7 @@ else
 endif
 LIBS      = 
 INCLUDE   = -I./include
-TARGET    = idana
+TARGET    = ./bin/idana
 SRCDIR    = ./source
 ifeq "$(strip $(SRCDIR))" ""
   SRCDIR  = .

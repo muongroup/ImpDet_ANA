@@ -23,13 +23,13 @@ CountManager::~CountManager()
 
 void CountManager::CountUp(const char *str)
 {
-    if (strcmp(str, "READ")==0)
+    if (strcmp(str, "READ") == 0)
         readCnt_++;
-    if (strcmp(str, "ACCE")==0)
+    if (strcmp(str, "ACCE") == 0)
         acceptCnt_++;
-    if (strcmp(str, "IDEA")==0)
+    if (strcmp(str, "IDEA") == 0)
         idealEveCnt_++;
-    if (strcmp(str, "ZERO")==0)
+    if (strcmp(str, "ZERO") == 0)
         zeroVecCnt_++;
     // else
     //     cout << "Write correct arg in CountManager::CountUp()" << endl;
@@ -37,13 +37,13 @@ void CountManager::CountUp(const char *str)
 
 void CountManager::CountZero(const char *str)
 {
-    if (strcmp(str, "READ")==0)
+    if (strcmp(str, "READ") == 0)
         readCnt_ = 0;
-    if (strcmp(str, "ACCE")==0)
+    if (strcmp(str, "ACCE") == 0)
         acceptCnt_ = 0;
-     if (strcmp(str, "IDEA")==0)
+    if (strcmp(str, "IDEA") == 0)
         idealEveCnt_ = 0;
-     if (strcmp(str, "ZERO")==0)
+    if (strcmp(str, "ZERO") == 0)
         zeroVecCnt_ = 0;
     // else
     //     cout << "Write correct arg in CountManager::CountZero()" << endl;
@@ -51,18 +51,19 @@ void CountManager::CountZero(const char *str)
 
 Int_t CountManager::GetCount(const char *str)
 {
-    if (strcmp(str, "READ")==0){
+    if (strcmp(str, "READ") == 0)
+    {
         return readCnt_;
     }
-    if (strcmp(str, "ACCE")==0)
+    if (strcmp(str, "ACCE") == 0)
     {
         return acceptCnt_;
     }
-    if (strcmp(str, "IDEA")==0)
+    if (strcmp(str, "IDEA") == 0)
     {
         return idealEveCnt_;
     }
-    if (strcmp(str, "ZERO")==0)
+    if (strcmp(str, "ZERO") == 0)
     {
         return zeroVecCnt_;
     }
