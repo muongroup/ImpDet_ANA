@@ -308,3 +308,10 @@ void HistManager::Draw2Dhist()
     vecploterr->Draw("COLZ");
     cvs9->Print("./4_gif/Int_tensity_2D_error.gif");
 }
+
+Int_t HistManager::GetMaxHistBin(Int_t i)
+{
+    Int_t max;
+    max = hist[i]->GetMaximumBin();
+    return max;
+}

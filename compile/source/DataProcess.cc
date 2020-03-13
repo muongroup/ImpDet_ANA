@@ -33,19 +33,87 @@ DataProcess::~DataProcess()
 void DataProcess::DataLoad()
 {
     ifstream config("./1_info/config.txt");
-    ifstream pedestal("./1_info/pedestal.txt");
+    // ifstream pedestal("./1_info/pedestal.txt");
     ifstream threshould("./1_info/threshould.txt");
     for (Int_t i = 0; i < CH; i++)
     {
         config >> easCH_[i] >> detCH_[i];
-        pedestal >> ped_[i];
+        // pedestal >> ped_[i];
         threshould >> thresh_[i];
     }
     config.close();
-    pedestal.close();
+    // pedestal.close();
     threshould.close();
 }
 
+void DataProcess::FillHist(ifstream &aFile)
+{
+    UInt_t val;
+
+    aFile.read((char *)&val, sizeof(Int_t));
+
+    if (val == 0xffffea0c)
+    {
+        aFile.read((char *)&val, sizeof(Int_t)); //Header2 : reserved Number of word(16bit)
+        aFile.read((char *)&val, sizeof(Int_t)); //Header3 : Eventcounter(12bit) : easiroc識別番号(1 or 2 下位16bit)
+        easID_1_ = (val & 0xffff);
+        eveCnt_1_ = (val >> 16);
+
+        for (Int_t i = 0; i < CH; i++)
+        {
+            if (easID_1_ == 1)
+            {
+                aFile.read((char *)&val, sizeof(Int_t));
+                Int_t buffer = val & 0xffff;
+
+                if (i < CH / 2)
+                {
+                    HistManager::SetHist(detCH_[i], buffer);
+                }
+            }
+            else
+            {
+                cout << "Data is not correct (mu-PSD1)" << endl;
+            }
+        }
+    }
+
+    aFile.read((char *)&val, sizeof(Int_t));
+    if (val == 0xffffea0c)
+    {
+        aFile.read((char *)&val, sizeof(Int_t)); //Header2 : reserved Number of word(16bit)
+        aFile.read((char *)&val, sizeof(Int_t)); //Header3 : Eventcounter(12bit) : easiroc識別番号(1 or 2 下位16bit)
+
+        easID_2_ = (val & 0xffff);
+
+        eveCnt_2_ = (val >> 16);
+
+        for (Int_t i = 0; i < CH; i++)
+        {
+            if (easID_2_ == 2)
+            {
+                aFile.read((char *)&val, sizeof(Int_t));
+                Int_t buffer = val & 0xffff;
+                if (i < CH / 2)
+                {
+                    HistManager::SetHist(detCH_[i + (CH / 2)], buffer);
+                }
+            }
+            else
+            {
+                cout << "Data is not correct (mu-PSD2)" << endl;
+            }
+        }
+    }
+}
+
+void DataProcess::SetPedestal()
+{
+    for (Int_t i = 0; i < CH; i++)
+    {
+        ped_[i] = HistManager::GetMaxHistBin(i);
+    }
+}
 void DataProcess::GetDatafromBinary(ifstream &aFile)
 {
     UInt_t val;

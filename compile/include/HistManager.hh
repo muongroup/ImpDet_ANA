@@ -39,6 +39,7 @@ public:
     static void SetGrValue(int point, int x, int y);
     static void SetGrError(int point, double ex, double ey);
     // Getter
+    static Int_t GetMaxHistBin(Int_t i);
     // static TH1F *GetCoinhist() { return coinhist; }
     // static TH1F *GetHist() { return hist; }
     // static TH1F *GetLosthist() { return losthist; }

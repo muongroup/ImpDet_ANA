@@ -22,6 +22,8 @@ public:
 
 public:
     void DataLoad();
+    void FillHist(ifstream &);
+    void SetPedestal();
     void GetDatafromBinary(ifstream &);
     void SetADCch();
     void SetFlag();
@@ -41,7 +43,7 @@ protected:
     // load from txt
     Int_t easCH_[CH];
     Int_t detCH_[CH];
-    Double_t ped_[CH];
+    Int_t ped_[CH];
     Double_t thresh_[CH];
     // header date
     Int_t easID_1_;

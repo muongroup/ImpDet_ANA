@@ -80,6 +80,13 @@ void idana()
     stat(ss1.str().c_str(), &st);
     time_t date = st.st_mtime;
 
+    while (!aFile.eof())
+    {
+      dP.FillHist(aFile);
+    }
+    dP.SetPedestal();
+    aFile.clear();
+    aFile.seekg(0);
     // a file read
     while (!aFile.eof())
     {
@@ -95,7 +102,7 @@ void idana()
     HistManager::SetGrValue(iiii, iiii, CountManager::GetCount("ZERO"));
     HistManager::SetGrError(iiii, 0., sqrt((Double_t)(CountManager::GetCount("ZERO"))));
   }
- ///////////////////////////////CREATE HISTGRAM
+  ///////////////////////////////CREATE HISTGRAM
   HistManager::DrawHist();
   HistManager::DrawCoinhist();
   dP.WriteFitPara();
