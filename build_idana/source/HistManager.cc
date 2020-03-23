@@ -300,13 +300,13 @@ void HistManager::Draw2Dhist()
     cvs8->cd();
     vecplot->SetStats(0);
     vecplot->Draw("COLZ");
-    cvs8->Print("./4_gif/Int_tensity_2D.gif");
+    cvs8->Print("./4_gif/Intensity_2D.gif");
 
     TCanvas *cvs9 = new TCanvas("cvs9", "vector plot error");
     cvs9->cd();
     vecploterr->SetStats(0);
     vecploterr->Draw("COLZ");
-    cvs9->Print("./4_gif/Int_tensity_2D_error.gif");
+    cvs9->Print("./4_gif/Intensity_2D_error.gif");
 }
 
 Int_t HistManager::GetMaxHistBin(Int_t i)

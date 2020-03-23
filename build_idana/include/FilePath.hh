@@ -1,8 +1,10 @@
 #ifndef FilePath_h
 #define FilePath_h 1
 
+#include <string>
 #include <RtypesCore.h>
 
+using namespace std;
 class FilePath
 {
 public:
@@ -20,6 +22,8 @@ public:
     // messenger
     void FileListMessenger();
     void LoadingMessenger(bool,Int_t);
+    // date
+    static string GetFileTime(string filename,const char* type);
 
 protected:
     static Int_t filenum_;

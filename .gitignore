@@ -3,3 +3,6 @@ obj/
 *dat*
 test/
 test~/
+*pdf
+*gif
+1_info/
