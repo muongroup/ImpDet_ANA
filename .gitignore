@@ -5,5 +5,5 @@ test/
 test~/
 *pdf
 *gif
-1_info/
+./1_info/
 archive/
